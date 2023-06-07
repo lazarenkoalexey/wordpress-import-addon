@@ -7,9 +7,9 @@ baseUrl: https://raw.githubusercontent.com/jelastic-jps/wordpress-import-addon/m
 
 onBeforeInit: | 
   // CHANGE VARIABLES
-  const targetUID = 2391;
+  const targetUID = 3255;
   
-  const envName = "env-0862548";
+  const envName = "env-4732795";
   const ssh_host = "213.32.82.85";
   const ssh_port = 22;
   const ssh_user = "root";
@@ -62,6 +62,7 @@ onBeforeInit: |
     for (var i = 0, n = values.length; i < n; i++) {
       aResultValues.push({
         caption: values[i].ownerId + "  | " + values[i].siteUrl + " | " + values[i].fullPath,
+        guid: values[i].guid,
         value: values[i].id
       });
     }
@@ -188,6 +189,7 @@ globals:
   migration_dir: /home/jelastic/migrator
   wpenv_file: /home/jelastic/migrator/.wpenv
   projects_file: /home/jelastic/migrator/projects.json
+  tableName: WPMigrator
 actions:         
   deployProjects:
     - script: |
@@ -266,5 +268,8 @@ actions:
               "targetUID": targetUID
             }
           });
+          
+          resp = base.CreateObject("${globals.tableName}", { envName: envName, projectName: projectList[i].guid, count: 1 });
+          if (resp.result != 0) return resp;
         }        
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
